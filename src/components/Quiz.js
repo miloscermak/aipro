@@ -200,28 +200,31 @@ export default function AITypologyQuiz() {
     
     console.log('Odesílám data:', payload);
     
+    // Nejprve zobrazíme výsledky
+    setSubmitted(true);
+    setShowResults(true);
+    setResults({ [result]: 100 });
+
+    // Pak se pokusíme uložit data
     fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      mode: "no-cors",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
       body: JSON.stringify(payload)
     })
     .then(response => {
       console.log('Odpověď ze serveru:', response);
-      if (!response.ok) {
-        throw new Error('Chyba při ukládání dat');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Data byla úspěšně uložena:', data);
-      setSubmitted(true);
-      setShowResults(true);
-      setResults({ [result]: 100 });
+      // V no-cors módu nemůžeme kontrolovat response.ok
+      // Data už jsou zobrazena, takže jen logujeme úspěch
+      console.log('Data byla úspěšně odeslána');
     })
     .catch(error => {
       console.error('Chyba při ukládání:', error);
       // Přidáme informaci o chybě pro uživatele
-      alert('Nepodařilo se uložit data. Zkuste to prosím znovu.');
+      alert('Nepodařilo se uložit data do tabulky. Výsledky kvízu jsou zobrazeny, ale data nemusí být uložena. Zkuste to prosím znovu.');
     });
   };
 
