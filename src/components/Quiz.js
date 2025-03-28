@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import jsPDF from "jspdf";
 
 const questions = [
@@ -132,64 +128,19 @@ const questions = [
 const resultTypes = ["Asistent (Alfred)", "Parťák (Watson)", "Kouč (Mickey)", "Guru (Džin)", "Nechtěný kamarád (Clippy)"];
 
 export default function AITypologyQuiz() {
-  const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [metadata, setMetadata] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState({});
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    const result = calculateResult();
-    const descriptions = {
-      "Asistent (Alfred)": "Potřebujete spolehlivého pomocníka, který se neptá proč, ale kdy. AI vnímáte jako nástroj, který vám má odlehčit ruce a zjednodušit den. Nejlépe funguje, když je neviditelná a přesná – jako dobře naladěný backend vašeho pracovního života.",
-      "Parťák (Watson)": "AI je pro vás parťák do dialogu – ne génius, ne sluha, ale spolehlivý spoluhráč. Pomáhá vám formulovat myšlenky, strukturovat nápady a občas říct: 'Nesouhlasím.' Vzájemná spolupráce je pro vás cesta, ne cíl.",
-      "Kouč (Mickey)": "Rádi se necháváte vyzývat. AI má být někdo, kdo vás donutí přemýšlet lépe, přesněji, tvrději. Nehledáte pohodlí, ale výzvu. Mluvíte spolu, protože chcete růst – ne proto, že si chcete ušetřit práci.",
-      "Guru (Džin)": "Ve světě informací hledáte překvapení. AI je pro vás pramen podivností, nápadů a nečekaných souvislostí. Věříte, že i digitální mozek může mít intuici – a občas vás přesvědčí, že ano.",
-      "Nechtěný kamarád (Clippy)": "S AI zatím nevedete přátelský rozhovor. Možná se vám vnucuje, když to nepotřebujete, a mlčí, když by mohla pomoci. Ale i Clippy se může jednou proměnit v Alfreda – pokud dostane správné instrukce."
-    };
-
-    doc.setFontSize(16);
-    doc.text("Výsledek AI typologie", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Jméno: ${metadata.firstName || "(neuvedeno)"}`, 20, 30);
-    doc.text(`Profese: ${metadata.profession || "(neuvedeno)"}`, 20, 40);
-    doc.text(`Věková skupina: ${metadata.ageGroup || "(neuvedeno)"}`, 20, 50);
-    doc.text(`Typ AI: ${result}`, 20, 60);
-
-    const description = descriptions[result] || "";
-    doc.text("Popis: ", 20, 70);
-    doc.text(doc.splitTextToSize(description, 170), 20, 78);
-
-    let y = 120;
-    let answerIndex = 0;
-    questions.forEach((q, idx) => {
-      if (q.input && q.key) {
-        doc.text(`${q.text}`, 20, y);
-        y += 6;
-        doc.text(`→ ${metadata[q.key] || "(neuvedeno)"}`, 25, y);
-        y += 10;
-      } else if (q.options && answers[answerIndex] !== null) {
-        doc.text(`${q.text}`, 20, y);
-        y += 6;
-        doc.text(`→ ${q.options[answers[answerIndex]]}`, 25, y);
-        y += 10;
-        answerIndex++;
-      }
-    });
-
-    doc.save("vysledek-ai-typologie.pdf");
-  };
 
   const handleOptionSelect = (questionIndex, optionIndex) => {
-    const newAnswers = [...answers];
-    newAnswers[questionIndex] = optionIndex;
-    setAnswers(newAnswers);
+    setAnswers(prev => ({ ...prev, [questionIndex]: optionIndex }));
   };
 
   const handleInputChange = (key, value) => {
-    setMetadata((prev) => ({ ...prev, [key]: value }));
+    setMetadata(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = () => {
@@ -204,7 +155,6 @@ export default function AITypologyQuiz() {
     let totalAnswers = 0;
 
     answers.forEach((answer, index) => {
-      // Přeskočíme textové otázky
       if (questions[index].input) return;
       
       if (answer !== null && answer >= 0 && answer < 5) {
@@ -213,7 +163,6 @@ export default function AITypologyQuiz() {
       }
     });
 
-    // Pokud nejsou žádné odpovědi, vrátíme výchozí hodnotu
     if (totalAnswers === 0) return resultTypes[0];
 
     const maxIndex = counts.indexOf(Math.max(...counts));
@@ -228,7 +177,6 @@ export default function AITypologyQuiz() {
       timestamp: new Date().toISOString()
     };
     
-    // Uložení do Google Sheets
     fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -244,7 +192,14 @@ export default function AITypologyQuiz() {
       console.error('Chyba:', error);
     });
   };
-  
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("Výsledky kvízu", 20, 20);
+    doc.text(`Výsledek: ${calculateResult()}`, 20, 30);
+    doc.save("vysledky-kvizu.pdf");
+  };
+
   if (showResults) {
     return (
       <div className="max-w-2xl mx-auto p-6 animate-fade-in">
@@ -298,10 +253,12 @@ export default function AITypologyQuiz() {
       
       <div className="space-y-4">
         {questions[currentQuestion].input ? (
-          <Input
+          <input
+            type="text"
             value={metadata[questions[currentQuestion].key] || ''}
             onChange={(e) => handleInputChange(questions[currentQuestion].key, e.target.value)}
             className="w-full p-4 border rounded-lg"
+            placeholder="Zadejte svou odpověď..."
           />
         ) : questions[currentQuestion].options ? (
           questions[currentQuestion].options.map((option, index) => (
