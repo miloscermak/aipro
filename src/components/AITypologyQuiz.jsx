@@ -1,0 +1,1 @@
+export default function AITypologyQuiz() { return <div>Quiz will go here</div>; }
