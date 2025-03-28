@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import jsPDF from "jspdf";
 
 const questions = [
   {
@@ -130,8 +131,6 @@ const questions = [
 
 const resultTypes = ["Asistent (Alfred)", "Parťák (Watson)", "Kouč (Mickey)", "Guru (Džin)", "Nechtěný kamarád (Clippy)"];
 
-import jsPDF from "jspdf";
-
 export default function AITypologyQuiz() {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [metadata, setMetadata] = useState({});
@@ -228,10 +227,21 @@ export default function AITypologyQuiz() {
       result: calculateResult(),
       timestamp: new Date().toISOString()
     };
-    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+    
+    // Uložení do Google Sheets
+    fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Chyba při ukládání dat');
+      }
+      console.log('Data byla úspěšně uložena');
+    })
+    .catch(error => {
+      console.error('Chyba:', error);
     });
   };
   
