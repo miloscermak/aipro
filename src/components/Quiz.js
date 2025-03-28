@@ -3,124 +3,81 @@ import jsPDF from "jspdf";
 
 const questions = [
   {
-    text: "Vaše křestní jméno:",
-    input: true,
-    key: "firstName"
+    key: "firstName",
+    text: "Jak se jmenujete?",
+    input: true
   },
   {
-    text: "Vaše profese:",
-    input: true,
-    key: "profession"
+    key: "profession",
+    text: "Jaká je vaše profese?",
+    input: true
   },
   {
-    text: "Vyberte svou věkovou skupinu:",
+    key: "ageGroup",
+    text: "Do jaké věkové skupiny patříte?",
+    options: ["18-24", "25-34", "35-44", "45-54", "55+"]
+  },
+  {
+    text: "Jaký je váš oblíbený způsob trávení volného času?",
     options: [
-      "Do 25 let",
-      "26–35 let",
-      "36–50 let",
-      "51–65 let",
-      "Nad 65 let"
-    ],
-    key: "ageGroup"
-  },
-  {
-    text: "Kterou z těchto vět byste pravděpodobně řekli v pondělí ráno?",
-    options: [
-      "Mám plán, potřebuji, aby všechno běželo hladce.",
-      "Potřebuju někoho, s kým to proberu.",
-      "Nechci slyšet výmluvy, jen chci výsledky.",
-      "Doufám, že dnes přijde nějaký zajímavý podnět.",
-      "Zase mi bude AI nabízet pomoc, kterou nechci."
+      "Čtení knih",
+      "Sport",
+      "Hraní her",
+      "Sledování filmů"
     ]
   },
   {
-    text: "Jak by vypadala ideální interakce s AI během vaší pracovní rutiny?",
+    text: "Jak se cítíte ve společnosti?",
     options: [
-      "Předám jí úkol, ona ho udělá.",
-      "Diskutujeme nad zadáním, ladíme výstup.",
-      "AI mě upozorní, když dělám chybu.",
-      "AI mi řekne něco, co bych sám neodhadl.",
-      "Zkouším ji ignorovat, ale stejně se ozve."
+      "Pohodlně a energicky",
+      "Trochu nejistě",
+      "Velmi nejistě",
+      "Záleží na situaci"
     ]
   },
   {
-    text: "Jak se tváříte, když AI začne odpovídat na něco, co jste jí nezadal/a?",
+    text: "Jak řešíte problémy?",
     options: [
-      "Přerušuju ji. Nechci ztrácet čas.",
-      "Občas mě inspiruje, nechám ji domluvit.",
-      "Zajímá mě, kam tím míří – třeba mě prověří.",
-      "Naslouchám, může z toho vypadnout vhled.",
-      "Zavírám záložku. Děkuji, nechci."
+      "Logicky a systematicky",
+      "Intuitivně a kreativně",
+      "S pomocí druhých",
+      "Zkusím to a uvidím"
     ]
   },
   {
-    text: "Představte si, že vám AI každý den položí jednu otázku. Jaká by měla být?",
+    text: "Jaký je váš ideální pracovní den?",
     options: [
-      "Co pro vás dnes mohu udělat?",
-      "Co si o tom myslíte vy?",
-      "Jste si tím jistý/á?",
-      "Napadlo vás na to podívat se jinak?",
-      "Můžu vám znovu připomenout, že existuji?"
+      "Strukturovaný a plánovaný",
+      "Flexibilní a spontánní",
+      "Spolupráce s ostatními",
+      "Samostatná práce"
     ]
   },
   {
-    text: "Kterou z těchto vět by o vás řekl váš ideální AI pomocník?",
+    text: "Jak se učíte nové věci?",
     options: [
-      "Vždy ví, co chce, a já to dodám.",
-      "Potřebuje se občas ujistit, že jde správným směrem.",
-      "Nespokojí se s prvním návrhem, rád/a mě testuje.",
-      "Nechá mě tvořit a pak si z toho vybere.",
-      "Většinou mě nechce slyšet, ale já to zkouším."
+      "Čtením a studiem",
+      "Praktickým zkoušením",
+      "Diskuzí s ostatními",
+      "Vlastním tempem"
     ]
   },
   {
-    text: "Kterou schopnost by měla mít AI, aby se vám skutečně hodila?",
+    text: "Jaký je váš přístup k rozhodování?",
     options: [
-      "Precizně zformulovat text podle zadání.",
-      "Doplnit moje myšlení, když se zaseknu.",
-      "Upozornit mě, když přehlížím chybu.",
-      "Překvapit mě novým nápadem.",
-      "Držet se zpátky, dokud ji opravdu nepotřebuju."
+      "Analytický a promyšlený",
+      "Intuitivní a rychlý",
+      "Konzultuji s ostatními",
+      "Záleží na situaci"
     ]
   },
   {
-    text: "Jak vypadá vaše typická práce s informacemi?",
+    text: "Jak se vyrovnáváte se stresem?",
     options: [
-      "Shromáždit, zformátovat, odevzdat.",
-      "Zapsat si nápady a postupně je ladit.",
-      "Hledám slabiny a ladím přesnost.",
-      "Chytám se jakéhokoli podnětu k inovaci.",
-      "Všechno si dělám sám/sama, nechci pomoc."
-    ]
-  },
-  {
-    text: "Který z těchto obrazů nejlépe vystihuje vaši spolupráci s AI?",
-    options: [
-      "Letištní věž a pilot – já řídím, ona naviguje.",
-      "Spoluautoři – navrhujeme, přepisujeme, ladíme.",
-      "Trenér a sportovec – AI mě nutí jet na hraně.",
-      "Průvodce v cizím městě – ukazuje cesty, které bych minul.",
-      "Kolega, co pořád něco říká přes stěnu."
-    ]
-  },
-  {
-    text: "Když si AI zvolíte jako nástroj, co od ní v hloubi duše očekáváte?",
-    options: [
-      "Aby pracovala bez řečí.",
-      "Aby mě motivovala ke zlepšení.",
-      "Aby mě podržela i zpochybnila.",
-      "Aby mě překvapila.",
-      "Aby mě nechala na pokoji."
-    ]
-  },
-  {
-    text: "Jaká AI by vám skutečně imponovala?",
-    options: [
-      "Tichá a precizní.",
-      "Přemýšlivá a pozorná.",
-      "Přísná a férová.",
-      "Podivná a geniální.",
-      "Mlčící a nenápadná."
+      "Plánováním a organizací",
+      "Meditací a relaxací",
+      "Mluvím o tom s ostatními",
+      "Sportem a aktivitou"
     ]
   }
 ];
