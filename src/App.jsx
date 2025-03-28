@@ -3,8 +3,8 @@ import AITypologyQuiz from "./components/AITypologyQuiz";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 p-6">
-      <h1 className="text-2xl font-bold mb-6">AI Typology Quiz</h1>
+    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h1>AI Typology Quiz</h1>
       <AITypologyQuiz />
     </div>
   );
