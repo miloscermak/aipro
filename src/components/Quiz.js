@@ -182,6 +182,16 @@ export default function AITypologyQuiz() {
 
   const handleSaveData = () => {
     const result = calculateResult();
+    const scriptId = process.env.REACT_APP_GOOGLE_SCRIPT_ID;
+    
+    console.log('Google Script ID:', scriptId);
+    
+    if (!scriptId) {
+      console.error('Chybí Google Script ID v proměnných prostředí');
+      alert('Chyba konfigurace: Chybí Google Script ID');
+      return;
+    }
+
     const payload = {
       timestamp: new Date().toISOString(),
       firstName: metadata.firstName || '',
@@ -206,7 +216,7 @@ export default function AITypologyQuiz() {
     setResults({ [result]: 100 });
 
     // Pak se pokusíme uložit data
-    fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
+    fetch(`https://script.google.com/macros/s/${scriptId}/exec`, {
       method: "POST",
       mode: "no-cors",
       headers: {
