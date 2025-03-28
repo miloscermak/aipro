@@ -84,6 +84,60 @@ const questions = [
 
 const resultTypes = ["Asistent (Alfred)", "Parťák (Watson)", "Kouč (Mickey)", "Guru (Džin)", "Nechtěný kamarád (Clippy)"];
 
+// Mapování odpovědí na typy AI
+const answerMapping = {
+  // Otázka 3 (věková skupina) se nepočítá do výsledku
+  // Otázka 4 (volný čas)
+  4: {
+    0: 0, // Čtení knih -> Alfred
+    1: 1, // Sport -> Watson
+    2: 2, // Hraní her -> Mickey
+    3: 3  // Sledování filmů -> Džin
+  },
+  // Otázka 5 (společnost)
+  5: {
+    0: 1, // Pohodlně a energicky -> Watson
+    1: 2, // Trochu nejistě -> Mickey
+    2: 4, // Velmi nejistě -> Clippy
+    3: 0  // Záleží na situaci -> Alfred
+  },
+  // Otázka 6 (řešení problémů)
+  6: {
+    0: 0, // Logicky a systematicky -> Alfred
+    1: 3, // Intuitivně a kreativně -> Džin
+    2: 1, // S pomocí druhých -> Watson
+    3: 2  // Zkusím to a uvidím -> Mickey
+  },
+  // Otázka 7 (pracovní den)
+  7: {
+    0: 0, // Strukturovaný a plánovaný -> Alfred
+    1: 3, // Flexibilní a spontánní -> Džin
+    2: 1, // Spolupráce s ostatními -> Watson
+    3: 4  // Samostatná práce -> Clippy
+  },
+  // Otázka 8 (učení)
+  8: {
+    0: 0, // Čtením a studiem -> Alfred
+    1: 2, // Praktickým zkoušením -> Mickey
+    2: 1, // Diskuze s ostatními -> Watson
+    3: 3  // Vlastním tempem -> Džin
+  },
+  // Otázka 9 (rozhodování)
+  9: {
+    0: 0, // Analytický a promyšlený -> Alfred
+    1: 3, // Intuitivní a rychlý -> Džin
+    2: 1, // Konzultuji s ostatními -> Watson
+    3: 2  // Záleží na situaci -> Mickey
+  },
+  // Otázka 10 (stres)
+  10: {
+    0: 0, // Plánováním a organizací -> Alfred
+    1: 3, // Meditací a relaxací -> Džin
+    2: 1, // Mluvím o tom s ostatními -> Watson
+    3: 2  // Sportem a aktivitou -> Mickey
+  }
+};
+
 export default function AITypologyQuiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -111,17 +165,25 @@ export default function AITypologyQuiz() {
     const counts = [0, 0, 0, 0, 0];
     let totalAnswers = 0;
 
-    answers.forEach((answer, index) => {
-      if (questions[index].input) return;
+    // Procházíme všechny odpovědi
+    Object.entries(answers).forEach(([questionIndex, answerIndex]) => {
+      const questionNum = parseInt(questionIndex);
       
-      if (answer !== null && answer >= 0 && answer < 5) {
-        counts[answer]++;
+      // Přeskočíme textové otázky a věkovou skupinu
+      if (questions[questionNum].input || questionNum === 2) return;
+      
+      // Pokud máme mapování pro tuto otázku a odpověď
+      if (answerMapping[questionNum] && answerMapping[questionNum][answerIndex] !== undefined) {
+        const aiTypeIndex = answerMapping[questionNum][answerIndex];
+        counts[aiTypeIndex]++;
         totalAnswers++;
       }
     });
 
+    // Pokud nejsou žádné odpovědi, vrátíme výchozí hodnotu
     if (totalAnswers === 0) return resultTypes[0];
 
+    // Najdeme index s nejvyšším počtem odpovědí
     const maxIndex = counts.indexOf(Math.max(...counts));
     return resultTypes[maxIndex];
   };
