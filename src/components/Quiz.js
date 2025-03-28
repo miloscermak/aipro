@@ -206,13 +206,13 @@ export default function AITypologyQuiz() {
     setResults({ [result]: 100 });
 
     // Pak se pokusíme uložit data
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(payload));
-
     fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
       method: "POST",
       mode: "no-cors",
-      body: formData
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
     })
     .then(response => {
       console.log('Odpověď ze serveru:', response);
