@@ -181,11 +181,21 @@ export default function AITypologyQuiz() {
   };
 
   const handleSaveData = () => {
+    const result = calculateResult();
     const payload = {
-      answers,
-      metadata,
-      result: calculateResult(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      firstName: metadata.firstName || '',
+      profession: metadata.profession || '',
+      ageGroup: questions[2].options[answers[2] || 0] || '',
+      result: result,
+      answers: Object.entries(answers)
+        .filter(([index]) => !questions[parseInt(index)].input && parseInt(index) !== 2)
+        .map(([index, answerIndex]) => ({
+          question: questions[parseInt(index)].text,
+          answer: questions[parseInt(index)].options[answerIndex]
+        }))
+        .map(qa => `${qa.question}: ${qa.answer}`)
+        .join('\n')
     };
     
     fetch(`https://script.google.com/macros/s/${process.env.REACT_APP_GOOGLE_SCRIPT_ID}/exec`, {
@@ -200,10 +210,12 @@ export default function AITypologyQuiz() {
       console.log('Data byla úspěšně uložena');
       setSubmitted(true);
       setShowResults(true);
-      setResults({ [calculateResult()]: 100 });
+      setResults({ [result]: 100 });
     })
     .catch(error => {
       console.error('Chyba:', error);
+      // Přidáme informaci o chybě pro uživatele
+      alert('Nepodařilo se uložit data. Zkuste to prosím znovu.');
     });
   };
 
