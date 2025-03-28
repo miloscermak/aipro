@@ -86,51 +86,50 @@ const resultTypes = ["Asistent (Alfred)", "Parťák (Watson)", "Kouč (Mickey)",
 
 // Mapování odpovědí na typy AI
 const answerMapping = {
-  // Otázka 3 (věková skupina) se nepočítá do výsledku
-  // Otázka 4 (volný čas)
-  4: {
+  // Otázka 3 (volný čas)
+  3: {
     0: 0, // Čtení knih -> Alfred
     1: 1, // Sport -> Watson
     2: 2, // Hraní her -> Mickey
     3: 3  // Sledování filmů -> Džin
   },
-  // Otázka 5 (společnost)
-  5: {
+  // Otázka 4 (společnost)
+  4: {
     0: 1, // Pohodlně a energicky -> Watson
     1: 2, // Trochu nejistě -> Mickey
     2: 4, // Velmi nejistě -> Clippy
     3: 0  // Záleží na situaci -> Alfred
   },
-  // Otázka 6 (řešení problémů)
-  6: {
+  // Otázka 5 (řešení problémů)
+  5: {
     0: 0, // Logicky a systematicky -> Alfred
     1: 3, // Intuitivně a kreativně -> Džin
     2: 1, // S pomocí druhých -> Watson
     3: 2  // Zkusím to a uvidím -> Mickey
   },
-  // Otázka 7 (pracovní den)
-  7: {
+  // Otázka 6 (pracovní den)
+  6: {
     0: 0, // Strukturovaný a plánovaný -> Alfred
     1: 3, // Flexibilní a spontánní -> Džin
     2: 1, // Spolupráce s ostatními -> Watson
     3: 4  // Samostatná práce -> Clippy
   },
-  // Otázka 8 (učení)
-  8: {
+  // Otázka 7 (učení)
+  7: {
     0: 0, // Čtením a studiem -> Alfred
     1: 2, // Praktickým zkoušením -> Mickey
     2: 1, // Diskuze s ostatními -> Watson
     3: 3  // Vlastním tempem -> Džin
   },
-  // Otázka 9 (rozhodování)
-  9: {
+  // Otázka 8 (rozhodování)
+  8: {
     0: 0, // Analytický a promyšlený -> Alfred
     1: 3, // Intuitivní a rychlý -> Džin
     2: 1, // Konzultuji s ostatními -> Watson
     3: 2  // Záleží na situaci -> Mickey
   },
-  // Otázka 10 (stres)
-  10: {
+  // Otázka 9 (stres)
+  9: {
     0: 0, // Plánováním a organizací -> Alfred
     1: 3, // Meditací a relaxací -> Džin
     2: 1, // Mluvím o tom s ostatními -> Watson
@@ -152,13 +151,6 @@ export default function AITypologyQuiz() {
 
   const handleInputChange = (key, value) => {
     setMetadata(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSubmit = () => {
-    setSubmitted(true);
-    const result = calculateResult();
-    setResults({ [result]: 100 });
-    setShowResults(true);
   };
 
   const calculateResult = () => {
@@ -206,6 +198,9 @@ export default function AITypologyQuiz() {
         throw new Error('Chyba při ukládání dat');
       }
       console.log('Data byla úspěšně uložena');
+      setSubmitted(true);
+      setShowResults(true);
+      setResults({ [calculateResult()]: 100 });
     })
     .catch(error => {
       console.error('Chyba:', error);
@@ -306,10 +301,7 @@ export default function AITypologyQuiz() {
         
         {currentQuestion === questions.length - 1 ? (
           <button
-            onClick={() => {
-              handleSubmit();
-              handleSaveData();
-            }}
+            onClick={handleSaveData}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Dokončit kvíz
