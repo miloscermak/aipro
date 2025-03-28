@@ -184,11 +184,12 @@ export default function AITypologyQuiz() {
     const result = calculateResult();
     const scriptId = process.env.REACT_APP_GOOGLE_SCRIPT_ID;
     
+    console.log('Všechny proměnné prostředí:', process.env);
     console.log('Google Script ID:', scriptId);
     
     if (!scriptId) {
       console.error('Chybí Google Script ID v proměnných prostředí');
-      alert('Chyba konfigurace: Chybí Google Script ID');
+      alert('Chyba konfigurace: Chybí Google Script ID. Prosím, zkontrolujte .env soubor.');
       return;
     }
 
